@@ -11,11 +11,23 @@ namespace Dimensional_Jumper
             //Define global variables
             const int windowX = 1920;
             const int windowY = 1000;
-            string gameState = "intro";
+            string gameState = "level1";
+            int level = 1;
 
-            //Define intro variables
+            //Intro variables
             int introMenuIndex = 0;
             Color[] menuColors = { Color.BLACK, Color.GRAY, Color.GRAY, Color.GRAY };
+
+            //Controlscreen variables
+            Color wColor = Color.GRAY;
+            Color aColor = Color.GRAY;
+            Color dColor = Color.GRAY;
+            Color spaceColor = Color.GRAY;
+            Color tabColor = Color.GRAY;
+
+            //Game variables
+            Color playerC = Color.RED;
+            Rectangle playerRec = new Rectangle(600, 800, 50, 100);
 
 
             Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
@@ -58,7 +70,7 @@ namespace Dimensional_Jumper
                         switch (introMenuIndex)
                         {
                             case 0:
-                                gameState = "game";
+                                gameState = "level" + level;
                                 break;
 
                             case 1:
@@ -85,6 +97,80 @@ namespace Dimensional_Jumper
                     Raylib.DrawText("Controls", 50, 460, 64, menuColors[1]);
                     Raylib.DrawText("Level Select", 50, 520, 64, menuColors[2]);
                     Raylib.DrawText("Exit", 50, 580, 64, menuColors[3]);
+
+                    Raylib.EndDrawing();
+                }
+                else if (gameState == "controls")
+                {
+                    //Logic Controlscreen
+                    //Color Changes when you press the coresponding button
+                    if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
+                    {
+                        wColor = Color.BLACK;
+                    }
+                    else
+                    {
+                        wColor = Color.GRAY;
+                    }
+                    if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
+                    {
+                        aColor = Color.BLACK;
+                    }
+                    else
+                    {
+                        aColor = Color.GRAY;
+                    }
+                    if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
+                    {
+                        dColor = Color.BLACK;
+                    }
+                    else
+                    {
+                        dColor = Color.GRAY;
+                    }
+                    if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
+                    {
+                        spaceColor = Color.BLACK;
+                    }
+                    else
+                    {
+                        spaceColor = Color.GRAY;
+                    }
+                    if (Raylib.IsKeyDown(KeyboardKey.KEY_TAB))
+                    {
+                        tabColor = Color.BLACK;
+                    }
+                    else
+                    {
+                        tabColor = Color.GRAY;
+                    }
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+                    {
+                        gameState = "intro";
+                    }
+
+
+                    //Drawing Controlscreen
+                    Raylib.BeginDrawing();
+                    Raylib.ClearBackground(Color.PURPLE);
+
+                    //The controls
+                    Raylib.DrawText("W: Jump", 50, 100, 64, wColor);
+                    Raylib.DrawText("A: Walk Left", 50, 160, 64, aColor);
+                    Raylib.DrawText("D: Walk Right", 50, 220, 64, dColor);
+                    Raylib.DrawText("SPACE: Switch Dimensions", 50, 280, 64, spaceColor);
+                    Raylib.DrawText("TAB: Pause / Controls", 50, 340, 64, tabColor);
+                    Raylib.DrawText("BACKSPACE: Go back to game/menu", 50, 400, 64, Color.GRAY);
+
+                    Raylib.EndDrawing();
+                }
+                else if (gameState == "level1")
+                {
+                    //Drawing level 1
+                    Raylib.BeginDrawing();
+                    Raylib.ClearBackground(Color.PURPLE);
+
+                    Raylib.DrawRectangleRec(playerRec, playerC);
 
                     Raylib.EndDrawing();
                 }
