@@ -4,6 +4,38 @@ using Raylib_cs;
 
 namespace Dimensional_Jumper
 {
+    //Making a player class with a rectangle and a color
+    class Player
+    {
+        public Rectangle rec;
+        public Color c;
+        public int xspeed = 10;
+
+        public Player(Rectangle r, Color p)
+        {
+            this.rec = r;
+            this.c = p;
+        }
+
+        public void Update()
+        {
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
+            {
+                this.rec.x -= xspeed;
+            }
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
+            {
+                this.rec.x += xspeed;
+            }
+        }
+
+        public void Draw()
+        {
+            Raylib.DrawRectangleRec(this.rec, this.c);
+        }
+    }
+
+
     class Program
     {
         static void Main(string[] args)
@@ -26,11 +58,11 @@ namespace Dimensional_Jumper
             Color tabColor = Color.GRAY;
 
             //Game variables
-            Color playerC = Color.RED;
-            Rectangle playerRec = new Rectangle(600, 800, 50, 100);
+            Player player = new Player(new Rectangle(600, 800, 50, 100), Color.RED);
 
 
             Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
+            Raylib.SetTargetFPS(60);
 
             while (!Raylib.WindowShouldClose())
             {
@@ -166,11 +198,18 @@ namespace Dimensional_Jumper
                 }
                 else if (gameState == "level1")
                 {
+                    //Logic level 1
+                    //Check for movement controls for player
+                    player.Update();
+
+
+
                     //Drawing level 1
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.PURPLE);
 
-                    Raylib.DrawRectangleRec(playerRec, playerC);
+                    //Draw the player
+                    player.Draw();
 
                     Raylib.EndDrawing();
                 }
