@@ -4,37 +4,6 @@ using Raylib_cs;
 
 namespace Dimensional_Jumper
 {
-    //Making a player class with a rectangle and a color
-    class Player
-    {
-        public Rectangle rec;
-        public Color c;
-        public int xspeed = 10;
-
-        public Player(Rectangle r, Color p)
-        {
-            this.rec = r;
-            this.c = p;
-        }
-
-        public void Update()
-        {
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
-            {
-                this.rec.x -= xspeed;
-            }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
-            {
-                this.rec.x += xspeed;
-            }
-        }
-
-        public void Draw()
-        {
-            Raylib.DrawRectangleRec(this.rec, this.c);
-        }
-    }
-
 
     class Program
     {
@@ -43,24 +12,28 @@ namespace Dimensional_Jumper
             //Define global variables
             const int windowX = 1920;
             const int windowY = 1000;
-            string gameState = "level1";
+            string gameState = "intro";
             int level = 1;
+
 
             //Intro variables
             int introMenuIndex = 0;
-            Color[] menuColors = { Color.BLACK, Color.GRAY, Color.GRAY, Color.GRAY };
-
-            //Controlscreen variables
-            Color wColor = Color.GRAY;
-            Color aColor = Color.GRAY;
-            Color dColor = Color.GRAY;
-            Color spaceColor = Color.GRAY;
-            Color tabColor = Color.GRAY;
+            Color[] menuColors = { Color.BLACK, Color.GRAY, Color.GRAY };
 
             //Game variables
-            Player player = new Player(new Rectangle(600, 800, 50, 100), Color.RED);
+            Rectangle goalRec = new Rectangle(1700, 700, 100, 100);
+            Player player = new Player(new Rectangle(100, 50, 50, 100), Color.RED);
+            Platform[] platforms = new Platform[20];
+            //Level one platforms
+            platforms[0] = new Platform(new Rectangle(20, 200, 1900, 20), true);
+            platforms[1] = new Platform(new Rectangle(20, 400, 1900, 20), false);
+            platforms[2] = new Platform(new Rectangle(20, 600, 1900, 20), true);
+            platforms[3] = new Platform(new Rectangle(20, 800, 1900, 20), false);
+
+            int[] platformStartIndexes = { 0, 0, 4, };
 
 
+            //Raylib stuff
             Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
             Raylib.SetTargetFPS(60);
 
@@ -102,13 +75,10 @@ namespace Dimensional_Jumper
                         switch (introMenuIndex)
                         {
                             case 0:
-                                gameState = "level" + level;
+                                gameState = "game";
                                 break;
 
-                            case 1:
-                                gameState = "controls";
-                                break;
-                            case 3:
+                            case 2:
                                 Raylib.CloseWindow();
                                 break;
                         }
@@ -125,88 +95,64 @@ namespace Dimensional_Jumper
                     Raylib.DrawText("Jumper", 50, 200, 100, Color.BLACK);
 
                     //The menu
-                    Raylib.DrawText("Start", 50, 400, 64, menuColors[0]);
-                    Raylib.DrawText("Controls", 50, 460, 64, menuColors[1]);
-                    Raylib.DrawText("Level Select", 50, 520, 64, menuColors[2]);
-                    Raylib.DrawText("Exit", 50, 580, 64, menuColors[3]);
+                    Raylib.DrawText("Play", 50, 400, 64, menuColors[0]);
+                    Raylib.DrawText("Level Select", 50, 460, 64, menuColors[1]);
+                    Raylib.DrawText("Exit", 50, 520, 64, menuColors[2]);
+
+                    //Controls
+                    Raylib.DrawText("W: Jump", 500, 400, 64, Color.GRAY);
+                    Raylib.DrawText("A: Walk Left", 500, 460, 64, Color.GRAY);
+                    Raylib.DrawText("D: Walk Right", 500, 520, 64, Color.GRAY);
+                    Raylib.DrawText("SPACE: Switch Dimensions", 500, 580, 64, Color.GRAY);
+                    Raylib.DrawText("TAB: Pause / Controls", 500, 640, 64, Color.GRAY);
 
                     Raylib.EndDrawing();
                 }
-                else if (gameState == "controls")
+                else if (gameState == "game")
                 {
-                    //Logic Controlscreen
-                    //Color Changes when you press the coresponding button
-                    if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
+                    //Logic for the game
+                    //Function for the player movement
+                    player.Update();
+
+                    //Check player and platform collision
+                    for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
                     {
-                        wColor = Color.BLACK;
+                        player.Collision(platforms[i]);
                     }
-                    else
+
+                    //Check goal Collision
+                    if (Raylib.CheckCollisionRecs(goalRec, player.rec))
                     {
-                        wColor = Color.GRAY;
+                        gameState = "";
+
                     }
-                    if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
-                    {
-                        aColor = Color.BLACK;
-                    }
-                    else
-                    {
-                        aColor = Color.GRAY;
-                    }
-                    if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
-                    {
-                        dColor = Color.BLACK;
-                    }
-                    else
-                    {
-                        dColor = Color.GRAY;
-                    }
-                    if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
-                    {
-                        spaceColor = Color.BLACK;
-                    }
-                    else
-                    {
-                        spaceColor = Color.GRAY;
-                    }
-                    if (Raylib.IsKeyDown(KeyboardKey.KEY_TAB))
-                    {
-                        tabColor = Color.BLACK;
-                    }
-                    else
-                    {
-                        tabColor = Color.GRAY;
-                    }
-                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+
+                    //Check for menu controls
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_TAB))
                     {
                         gameState = "intro";
                     }
-
-
-                    //Drawing Controlscreen
-                    Raylib.BeginDrawing();
-                    Raylib.ClearBackground(Color.PURPLE);
-
-                    //The controls
-                    Raylib.DrawText("W: Jump", 50, 100, 64, wColor);
-                    Raylib.DrawText("A: Walk Left", 50, 160, 64, aColor);
-                    Raylib.DrawText("D: Walk Right", 50, 220, 64, dColor);
-                    Raylib.DrawText("SPACE: Switch Dimensions", 50, 280, 64, spaceColor);
-                    Raylib.DrawText("TAB: Pause / Controls", 50, 340, 64, tabColor);
-                    Raylib.DrawText("BACKSPACE: Go back to game/menu", 50, 400, 64, Color.GRAY);
-
-                    Raylib.EndDrawing();
-                }
-                else if (gameState == "level1")
-                {
-                    //Logic level 1
-                    //Check for movement controls for player
-                    player.Update();
-
-
+                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
+                    {
+                        for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                        {
+                            platforms[i].changeDimension();
+                        }
+                    }
 
                     //Drawing level 1
                     Raylib.BeginDrawing();
-                    Raylib.ClearBackground(Color.PURPLE);
+                    Raylib.ClearBackground(Color.BLACK);
+
+
+                    //Draw the platforms
+                    for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                    {
+                        platforms[i].Draw();
+                    }
+
+                    //Draw the goal
+                    Raylib.DrawRectangleRec(goalRec, Color.GREEN);
 
                     //Draw the player
                     player.Draw();
@@ -219,6 +165,169 @@ namespace Dimensional_Jumper
                     Raylib.ClearBackground(Color.WHITE);
                     Raylib.EndDrawing();
                 }
+
+            }
+        }
+
+        static void incrementLevel()
+        {
+            /*
+            level = 2;
+            player.startX = ;
+            player.startY = ;
+            player.rec.x = player.startX;
+            player.rec.y = player.startY;
+            player.accY = 0;
+            goalRec.x = 800;
+            goalRec.y = 800;
+             */
+        }
+
+
+    }
+
+    //Making a player class with a rectangle and a color
+    class Player
+    {
+        public Rectangle rec;
+        public Color c;
+        public int xspeed = 15;
+
+        public float oldX;
+
+        public float oldY;
+
+        public bool grounded = false;
+
+        public int startX = 100;
+        public int startY = 50;
+
+        public int g = 3;
+        public int accY = 0;
+
+        public Player(Rectangle r, Color p)
+        {
+            this.rec = r;
+            this.c = p;
+        }
+
+        public void Update()
+        {
+            //Stores old x and y levels for collision later
+            oldX = this.rec.x;
+            oldY = this.rec.y;
+
+            //Reads the key inputs
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
+            {
+                rec.x -= xspeed;
+            }
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
+            {
+                rec.x += xspeed;
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_W) && grounded)
+            {
+                accY = 40;
+                grounded = false;
+            }
+
+            //Calculating gravity and vertical acceleration
+            rec.y -= accY;
+            accY -= g;
+
+            if (this.rec.y + this.rec.height > 1000)
+            {
+                this.rec.x = startX;
+                this.rec.y = startY;
+                accY = 0;
+            }
+        }
+
+
+        public void Collision(Platform other)
+        {
+            if (Raylib.CheckCollisionRecs(this.rec, other.rec) && other.active)
+            {
+                g = 0;
+                accY = 0;
+                grounded = true;
+
+                if (oldY + this.rec.height <= other.rec.y)
+                {
+                    this.rec.y = other.rec.y - this.rec.height;
+                }
+                else if (oldY >= other.rec.y + other.rec.height)
+                {
+                    this.rec.y = other.rec.y + other.rec.height;
+                }
+                else if (oldX + this.rec.width <= other.rec.x)
+                {
+                    this.rec.x = other.rec.x - this.rec.width;
+                }
+                else if (oldX >= other.rec.x + other.rec.width)
+                {
+                    this.rec.x = other.rec.x + other.rec.width;
+                }
+                else
+                {
+                    this.rec.y = other.rec.y - this.rec.height;
+                }
+            }
+            else
+            {
+                g = 3;
+            }
+
+        }
+
+        //Function for drawing the player
+        public void Draw()
+        {
+            Raylib.DrawRectangleRec(this.rec, this.c);
+        }
+    }
+
+
+    //A class for a platform with a rectangle avd a boolean for which "dimension" its in at the start
+    class Platform
+    {
+        public Rectangle rec;
+
+        public Color c;
+
+        public bool active;
+
+        public Platform(Rectangle r, bool ac)
+        {
+            this.rec = r;
+            this.active = ac;
+            if (this.active)
+            {
+                this.c = Color.PURPLE;
+            }
+            else
+            {
+                this.c = Color.GRAY;
+            }
+        }
+
+        public void Draw()
+        {
+            Raylib.DrawRectangleRec(this.rec, this.c);
+        }
+
+        public void changeDimension()
+        {
+            if (this.active)
+            {
+                this.active = false;
+                this.c = Color.GRAY;
+            }
+            else
+            {
+                this.active = true;
+                this.c = Color.VIOLET;
             }
         }
     }
