@@ -25,12 +25,23 @@ namespace Dimensional_Jumper
             Player player = new Player(new Rectangle(100, 50, 50, 100), Color.RED);
             Platform[] platforms = new Platform[20];
             //Level one platforms
-            platforms[0] = new Platform(new Rectangle(20, 200, 1900, 20), true);
-            platforms[1] = new Platform(new Rectangle(20, 400, 1900, 20), false);
-            platforms[2] = new Platform(new Rectangle(20, 600, 1900, 20), true);
-            platforms[3] = new Platform(new Rectangle(20, 800, 1900, 20), false);
+            platforms[0] = new Platform(new Rectangle(0, 200, windowX, 20), true);
+            platforms[1] = new Platform(new Rectangle(0, 400, windowX, 20), false);
+            platforms[2] = new Platform(new Rectangle(0, 600, windowX, 20), true);
+            platforms[3] = new Platform(new Rectangle(0, 800, windowX, 20), false);
+            //Level two platforms
+            platforms[4] = new Platform(new Rectangle(0, 600, windowX, 400), true);
+            platforms[5] = new Platform(new Rectangle(700, 0, 200, windowY), true);
+            //Level three platforms
+            platforms[6] = new Platform(new Rectangle(100, 900, 200, 50), true);
+            platforms[7] = new Platform(new Rectangle(500, 650, 200, 50), false);
+            platforms[8] = new Platform(new Rectangle(100, 400, 200, 50), true);
+            platforms[9] = new Platform(new Rectangle(500, 150, 200, 50), false);
 
-            int[] platformStartIndexes = { 0, 0, 4, };
+
+            int[] platformStartIndexes = { 0, 0, 4, 6, 10 };
+            int frameCount = 0;
+            int dimensionFlipFrame = -200;
 
 
             //Raylib stuff
@@ -105,12 +116,28 @@ namespace Dimensional_Jumper
                     Raylib.DrawText("D: Walk Right", 500, 520, 64, Color.GRAY);
                     Raylib.DrawText("SPACE: Switch Dimensions", 500, 580, 64, Color.GRAY);
                     Raylib.DrawText("TAB: Pause / Controls", 500, 640, 64, Color.GRAY);
+                    Raylib.DrawText("ENTER: SELECT", 500, 700, 64, Color.GRAY);
+
 
                     Raylib.EndDrawing();
                 }
                 else if (gameState == "game")
                 {
+                    frameCount++;
                     //Logic for the game
+                    //If you switched dimensions last frame and now collide, then you respawn
+                    if (dimensionFlipFrame + 1 == frameCount)
+                    {
+                        for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                        {
+                            if (Raylib.CheckCollisionRecs(player.rec, platforms[i].rec) && platforms[i].active)
+                            {
+                                player.rec.x = player.startX;
+                                player.rec.y = player.startY;
+                                player.accY = 0;
+                            }
+                        }
+                    }
                     //Function for the player movement
                     player.Update();
 
@@ -123,7 +150,29 @@ namespace Dimensional_Jumper
                     //Check goal Collision
                     if (Raylib.CheckCollisionRecs(goalRec, player.rec))
                     {
-                        gameState = "";
+                        if (level == 1)
+                        {
+                            level++;
+                            player.startX = 100;
+                            player.startY = 100;
+                            player.rec.x = player.startX;
+                            player.rec.y = player.startY;
+                            player.accY = 0;
+                            goalRec.x = 1750;
+                            goalRec.y = 500;
+                        }
+                        else if (level == 2)
+                        {
+                            level++;
+
+                            player.startX = 100;
+                            player.startY = 800;
+                            player.rec.x = player.startX;
+                            player.rec.y = player.startY;
+                            player.accY = 0;
+                            goalRec.x = 1750;
+                            goalRec.y = 500;
+                        }
 
                     }
 
@@ -138,7 +187,11 @@ namespace Dimensional_Jumper
                         {
                             platforms[i].changeDimension();
                         }
+                        dimensionFlipFrame = frameCount;
                     }
+
+
+
 
                     //Drawing level 1
                     Raylib.BeginDrawing();
@@ -169,19 +222,6 @@ namespace Dimensional_Jumper
             }
         }
 
-        static void incrementLevel()
-        {
-            /*
-            level = 2;
-            player.startX = ;
-            player.startY = ;
-            player.rec.x = player.startX;
-            player.rec.y = player.startY;
-            player.accY = 0;
-            goalRec.x = 800;
-            goalRec.y = 800;
-             */
-        }
 
 
     }
@@ -236,7 +276,7 @@ namespace Dimensional_Jumper
             rec.y -= accY;
             accY -= g;
 
-            if (this.rec.y + this.rec.height > 1000)
+            if (this.rec.y >= 1000 || this.rec.y + this.rec.height <= 0 || this.rec.x + this.rec.width <= 0 || this.rec.x >= 1920)
             {
                 this.rec.x = startX;
                 this.rec.y = startY;
@@ -249,22 +289,25 @@ namespace Dimensional_Jumper
         {
             if (Raylib.CheckCollisionRecs(this.rec, other.rec) && other.active)
             {
-                g = 0;
-                accY = 0;
-                grounded = true;
-
+                //Up
                 if (oldY + this.rec.height <= other.rec.y)
                 {
+                    g = 0;
+                    accY = 0;
+                    grounded = true;
                     this.rec.y = other.rec.y - this.rec.height;
                 }
+                //Down
                 else if (oldY >= other.rec.y + other.rec.height)
                 {
                     this.rec.y = other.rec.y + other.rec.height;
                 }
+                //Left
                 else if (oldX + this.rec.width <= other.rec.x)
                 {
                     this.rec.x = other.rec.x - this.rec.width;
                 }
+                //Right
                 else if (oldX >= other.rec.x + other.rec.width)
                 {
                     this.rec.x = other.rec.x + other.rec.width;
