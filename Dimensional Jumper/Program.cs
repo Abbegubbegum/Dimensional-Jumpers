@@ -23,7 +23,7 @@ namespace Dimensional_Jumper
             //Game variables
             Rectangle goalRec = new Rectangle(1700, 700, 100, 100);
             Player player = new Player(new Rectangle(100, 50, 50, 100), Color.RED);
-            Platform[] platforms = new Platform[20];
+            Platform[] platforms = new Platform[25];
             //Level one platforms
             platforms[0] = new Platform(new Rectangle(0, 200, windowX, 20), true);
             platforms[1] = new Platform(new Rectangle(0, 400, windowX, 20), false);
@@ -36,12 +36,27 @@ namespace Dimensional_Jumper
             platforms[6] = new Platform(new Rectangle(100, 900, 200, 50), true);
             platforms[7] = new Platform(new Rectangle(500, 650, 200, 50), false);
             platforms[8] = new Platform(new Rectangle(100, 400, 200, 50), true);
-            platforms[9] = new Platform(new Rectangle(500, 150, 200, 50), false);
+            platforms[9] = new Platform(new Rectangle(600, 200, 200, 50), false);
+            platforms[10] = new Platform(new Rectangle(1200, 800, 200, 50), true);
+            //Level four platforms
+            platforms[11] = new Platform(new Rectangle(200, 200, 20, 400), true);
+            platforms[12] = new Platform(new Rectangle(200, 200, 400, 20), true);
+            platforms[13] = new Platform(new Rectangle(580, 200, 20, 400), true);
+            platforms[14] = new Platform(new Rectangle(200, 600, 400, 20), true);
+            platforms[15] = new Platform(new Rectangle(800, 200, 20, 400), true);
+            platforms[16] = new Platform(new Rectangle(800, 200, 400, 20), true);
+            platforms[17] = new Platform(new Rectangle(1180, 200, 20, 400), true);
+            platforms[18] = new Platform(new Rectangle(800, 600, 400, 20), true);
+            platforms[19] = new Platform(new Rectangle(1400, 200, 20, 400), true);
+            platforms[20] = new Platform(new Rectangle(1400, 200, 400, 20), true);
+            platforms[21] = new Platform(new Rectangle(1780, 200, 20, 400), true);
+            platforms[22] = new Platform(new Rectangle(1400, 600, 400, 20), true);
 
 
-            int[] platformStartIndexes = { 0, 0, 4, 6, 10 };
+            int[] platformStartIndexes = { 0, 0, 4, 6, 11, 23 };
             int frameCount = 0;
             int dimensionFlipFrame = -200;
+            int deathCount = 0;
 
 
             //Raylib stuff
@@ -132,6 +147,7 @@ namespace Dimensional_Jumper
                         {
                             if (Raylib.CheckCollisionRecs(player.rec, platforms[i].rec) && platforms[i].active)
                             {
+                                deathCount++;
                                 player.rec.x = player.startX;
                                 player.rec.y = player.startY;
                                 player.accY = 0;
@@ -140,6 +156,14 @@ namespace Dimensional_Jumper
                     }
                     //Function for the player movement
                     player.Update();
+
+                    if (player.rec.y >= 1000 || player.rec.x >= 1920 || player.rec.x + player.rec.width <= 0)
+                    {
+                        deathCount++;
+                        player.rec.x = player.startX;
+                        player.rec.y = player.startY;
+                        player.accY = 0;
+                    }
 
                     //Check player and platform collision
                     for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
@@ -165,13 +189,29 @@ namespace Dimensional_Jumper
                         {
                             level++;
 
-                            player.startX = 100;
-                            player.startY = 800;
+                            player.startX = 120;
+                            player.startY = 600;
                             player.rec.x = player.startX;
                             player.rec.y = player.startY;
                             player.accY = 0;
                             goalRec.x = 1750;
-                            goalRec.y = 500;
+                            goalRec.y = 800;
+                        }
+                        else if (level == 3)
+                        {
+                            level++;
+
+                            player.startX = 400;
+                            player.startY = 400;
+                            player.rec.x = player.startX;
+                            player.rec.y = player.startY;
+                            player.accY = 0;
+                            goalRec.x = 1550;
+                            goalRec.y = 700;
+                        }
+                        else if (level == 4)
+                        {
+                            gameState = "complete";
                         }
 
                     }
@@ -193,9 +233,10 @@ namespace Dimensional_Jumper
 
 
 
-                    //Drawing level 1
+                    //Drawing level 
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.BLACK);
+                    Raylib.DrawText("Death Count: " + deathCount, 25, 25, 64, Color.WHITE);
 
 
                     //Draw the platforms
@@ -209,6 +250,9 @@ namespace Dimensional_Jumper
 
                     //Draw the player
                     player.Draw();
+
+                    Raylib.DrawText("x :" + player.rec.x, 900, 100, 32, Color.WHITE);
+                    Raylib.DrawText("y :" + player.rec.y, 900, 170, 32, Color.WHITE);
 
                     Raylib.EndDrawing();
                 }
@@ -276,12 +320,6 @@ namespace Dimensional_Jumper
             rec.y -= accY;
             accY -= g;
 
-            if (this.rec.y >= 1000 || this.rec.y + this.rec.height <= 0 || this.rec.x + this.rec.width <= 0 || this.rec.x >= 1920)
-            {
-                this.rec.x = startX;
-                this.rec.y = startY;
-                accY = 0;
-            }
         }
 
 
