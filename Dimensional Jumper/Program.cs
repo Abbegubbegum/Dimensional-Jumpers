@@ -57,6 +57,8 @@ namespace Dimensional_Jumper
             int frameCount = 0;
             int dimensionFlipFrame = -200;
             int deathCount = 0;
+            int seconds = 0;
+            int minutes = 0;
 
 
             //Raylib stuff
@@ -138,8 +140,24 @@ namespace Dimensional_Jumper
                 }
                 else if (gameState == "game")
                 {
-                    frameCount++;
                     //Logic for the game
+                    //Calculating the clock with framecount
+
+                    frameCount++;
+                    if ((frameCount % 60) == 0)
+                    {
+                        seconds++;
+                        if ((seconds % 60) == 0)
+                        {
+                            minutes++;
+                            seconds = 0;
+                        }
+                    }
+
+
+
+
+
                     //If you switched dimensions last frame and now collide, then you respawn
                     if (dimensionFlipFrame + 1 == frameCount)
                     {
@@ -211,7 +229,7 @@ namespace Dimensional_Jumper
                         }
                         else if (level == 4)
                         {
-                            gameState = "complete";
+                            gameState = "finish";
                         }
 
                     }
@@ -237,6 +255,8 @@ namespace Dimensional_Jumper
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.BLACK);
                     Raylib.DrawText("Death Count: " + deathCount, 25, 25, 64, Color.WHITE);
+                    Raylib.DrawText("Time: " + minutes + ":" + seconds, 1500, 25, 64, Color.WHITE);
+
 
 
                     //Draw the platforms
@@ -251,9 +271,21 @@ namespace Dimensional_Jumper
                     //Draw the player
                     player.Draw();
 
-                    Raylib.DrawText("x :" + player.rec.x, 900, 100, 32, Color.WHITE);
-                    Raylib.DrawText("y :" + player.rec.y, 900, 170, 32, Color.WHITE);
-
+                    Raylib.EndDrawing();
+                }
+                else if (gameState == "finish")
+                {
+                    //Logic
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                    {
+                        gameState = "intro";
+                        level = 1;
+                    }
+                    //Drawing
+                    Raylib.BeginDrawing();
+                    Raylib.ClearBackground(Color.PURPLE);
+                    Raylib.DrawText("You won b", 50, 50, 64, Color.WHITE);
+                    Raylib.DrawText("Press enter to get to menu", 50, 300, 64, Color.WHITE);
                     Raylib.EndDrawing();
                 }
                 else
