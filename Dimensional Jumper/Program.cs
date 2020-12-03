@@ -53,7 +53,7 @@ namespace Dimensional_Jumper
             platforms[22] = new Platform(new Rectangle(1400, 600, 400, 20), true);
 
 
-            int[] platformStartIndexes = { 0, 0, 4, 6, 11, 23 };
+            int[] platformStartIndexes = { 0, 4, 6, 11, 23 };
             int frameCount = 0;
             int dimensionFlipFrame = -200;
             int deathCount = 0;
@@ -98,7 +98,7 @@ namespace Dimensional_Jumper
                         menuColors[introMenuIndex] = Color.BLACK;
                     }
                     //Menu confirming
-                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                     {
                         switch (introMenuIndex)
                         {
@@ -161,7 +161,7 @@ namespace Dimensional_Jumper
                     //If you switched dimensions last frame and now collide, then you respawn
                     if (dimensionFlipFrame + 1 == frameCount)
                     {
-                        for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                        for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                         {
                             if (Raylib.CheckCollisionRecs(player.rec, platforms[i].rec) && platforms[i].active)
                             {
@@ -184,7 +184,7 @@ namespace Dimensional_Jumper
                     }
 
                     //Check player and platform collision
-                    for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                    for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                     {
                         player.Collision(platforms[i]);
                     }
@@ -241,7 +241,7 @@ namespace Dimensional_Jumper
                     }
                     else if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
                     {
-                        for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                        for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                         {
                             platforms[i].changeDimension();
                         }
@@ -260,7 +260,7 @@ namespace Dimensional_Jumper
 
 
                     //Draw the platforms
-                    for (int i = platformStartIndexes[level]; i < platformStartIndexes[level + 1]; i++)
+                    for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                     {
                         platforms[i].Draw();
                     }
@@ -280,11 +280,22 @@ namespace Dimensional_Jumper
                     {
                         gameState = "intro";
                         level = 1;
+                        player.startX = 100;
+                        player.startY = 50;
+                        player.rec.x = player.startX;
+                        player.rec.y = player.startY;
+                        deathCount = 0;
+                        seconds = 0;
+                        minutes = 0;
+
                     }
                     //Drawing
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.PURPLE);
                     Raylib.DrawText("You won b", 50, 50, 64, Color.WHITE);
+                    Raylib.DrawText("Time: " + minutes + ":" + seconds, 450, 50, 64, Color.WHITE);
+                    Raylib.DrawText("Deaths: " + deathCount, 800, 50, 64, Color.WHITE);
+
                     Raylib.DrawText("Press enter to get to menu", 50, 300, 64, Color.WHITE);
                     Raylib.EndDrawing();
                 }
