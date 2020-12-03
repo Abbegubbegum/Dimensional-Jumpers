@@ -60,8 +60,10 @@ namespace Dimensional_Jumper
             int seconds = 0;
             int minutes = 0;
 
+            //Sound music = ;
 
             //Raylib stuff
+            Raylib.InitAudioDevice();
             Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
             Raylib.SetTargetFPS(60);
 
@@ -104,6 +106,17 @@ namespace Dimensional_Jumper
                         {
                             case 0:
                                 gameState = "game";
+                                for (int i = platformStartIndexes[0]; i < platformStartIndexes[1]; i++)
+                                {
+                                    if (i % 2 == 0)
+                                    {
+                                        platforms[i].active = true;
+                                    }
+                                    else
+                                    {
+                                        platforms[i].active = false;
+                                    }
+                                }
                                 break;
 
                             case 2:
@@ -171,6 +184,11 @@ namespace Dimensional_Jumper
                                 player.accY = 0;
                             }
                         }
+                        //Because you cant be grounded after, this helps so you cant jump mid-air
+                        if (player.grounded == true)
+                        {
+                            player.grounded = false;
+                        }
                     }
                     //Function for the player movement
                     player.Update();
@@ -194,6 +212,10 @@ namespace Dimensional_Jumper
                     {
                         if (level == 1)
                         {
+                            for (int i = platformStartIndexes[1]; i < platformStartIndexes[2]; i++)
+                            {
+                                platforms[i].active = true;
+                            }
                             level++;
                             player.startX = 100;
                             player.startY = 100;
@@ -207,6 +229,18 @@ namespace Dimensional_Jumper
                         {
                             level++;
 
+                            for (int i = platformStartIndexes[2]; i < platformStartIndexes[3]; i++)
+                            {
+                                if (i % 2 == 0)
+                                {
+                                    platforms[i].active = true;
+                                }
+                                else
+                                {
+                                    platforms[i].active = false;
+                                }
+                            }
+
                             player.startX = 120;
                             player.startY = 600;
                             player.rec.x = player.startX;
@@ -218,6 +252,10 @@ namespace Dimensional_Jumper
                         else if (level == 3)
                         {
                             level++;
+                            for (int i = platformStartIndexes[3]; i < platformStartIndexes[4]; i++)
+                            {
+                                platforms[i].active = true;
+                            }
 
                             player.startX = 400;
                             player.startY = 400;
@@ -439,20 +477,20 @@ namespace Dimensional_Jumper
         public void Draw()
         {
             Raylib.DrawRectangleRec(this.rec, this.c);
+
+            if (this.active)
+            {
+                this.c = Color.PURPLE;
+            }
+            else
+            {
+                this.c = Color.GRAY;
+            }
         }
 
         public void changeDimension()
         {
-            if (this.active)
-            {
-                this.active = false;
-                this.c = Color.GRAY;
-            }
-            else
-            {
-                this.active = true;
-                this.c = Color.VIOLET;
-            }
+            this.active = !this.active;
         }
     }
 }
