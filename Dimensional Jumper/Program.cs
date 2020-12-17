@@ -15,10 +15,15 @@ namespace Dimensional_Jumper
             string gameState = "intro";
             int level = 1;
 
+            //Raylib initialization
+            Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
+            Raylib.InitAudioDevice();
+            Raylib.SetTargetFPS(60);
 
             //Intro variables
             int introMenuIndex = 0;
-            Color[] menuColors = { Color.BLACK, Color.GRAY, Color.GRAY };
+            Color[] menuColors = { Color.BLACK, Color.GRAY, Color.GRAY, Color.GRAY };
+            string musicText = "Music ON";
 
             //Game variables
             Rectangle goalRec = new Rectangle(1700, 700, 100, 100);
@@ -59,16 +64,18 @@ namespace Dimensional_Jumper
             int deathCount = 0;
             int seconds = 0;
             int minutes = 0;
+            Sound song = Raylib.LoadSound("song.mp3");
+            Raylib.SetMasterVolume(0.2f);
+            bool music = true;
 
-            //Sound music = ;
-
-            //Raylib stuff
-            Raylib.InitAudioDevice();
-            Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
-            Raylib.SetTargetFPS(60);
 
             while (!Raylib.WindowShouldClose())
             {
+                if (!Raylib.IsSoundPlaying(song) && music)
+                {
+                    Raylib.PlaySound(song);
+                }
+
                 if (gameState == "intro")
                 {
                     //Logic Introscreen
@@ -85,6 +92,7 @@ namespace Dimensional_Jumper
                             introMenuIndex++;
                         }
                         menuColors[introMenuIndex] = Color.BLACK;
+
                     }
                     else if (Raylib.IsKeyPressed(KeyboardKey.KEY_W))
                     {
@@ -98,6 +106,7 @@ namespace Dimensional_Jumper
                             introMenuIndex--;
                         }
                         menuColors[introMenuIndex] = Color.BLACK;
+
                     }
                     //Menu confirming
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
@@ -120,6 +129,22 @@ namespace Dimensional_Jumper
                                 break;
 
                             case 2:
+
+                                if (music)
+                                {
+                                    Raylib.PauseSound(song);
+                                    music = false;
+                                    musicText = "Music OFF";
+                                }
+                                else
+                                {
+                                    Raylib.ResumeSound(song);
+                                    music = true;
+                                    musicText = "Music ON";
+                                }
+                                break;
+
+                            case 3:
                                 Raylib.CloseWindow();
                                 break;
                         }
@@ -138,7 +163,9 @@ namespace Dimensional_Jumper
                     //The menu
                     Raylib.DrawText("Play", 50, 400, 64, menuColors[0]);
                     Raylib.DrawText("Level Select", 50, 460, 64, menuColors[1]);
-                    Raylib.DrawText("Exit", 50, 520, 64, menuColors[2]);
+                    Raylib.DrawText(musicText, 50, 520, 64, menuColors[2]);
+                    Raylib.DrawText("Exit", 50, 580, 64, menuColors[3]);
+
 
                     //Controls
                     Raylib.DrawText("W: Jump", 500, 400, 64, Color.GRAY);
@@ -345,6 +372,10 @@ namespace Dimensional_Jumper
                 }
 
             }
+
+            Raylib.CloseAudioDevice();
+            Raylib.CloseWindow();
+
         }
 
 
@@ -494,4 +525,5 @@ namespace Dimensional_Jumper
         }
     }
 }
+
 
