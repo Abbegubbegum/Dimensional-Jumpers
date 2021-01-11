@@ -12,7 +12,7 @@ namespace Dimensional_Jumper
             //Define global variables
             const int windowX = 1920;
             const int windowY = 1000;
-            string gameState = "intro";
+            string gamestate = "intro";
             int level = 1;
 
             //Raylib initialization
@@ -27,56 +27,56 @@ namespace Dimensional_Jumper
 
             //Game variables
             Rectangle goalRec = new Rectangle(1700, 700, 100, 100);
-            Player player = new Player(new Rectangle(100, 50, 50, 100), Color.RED);
+            Player p = new Player(new Rectangle(100, 50, 50, 100), Color.RED);
             Platform[] platforms = new Platform[25];
             //Level one platforms
-            platforms[0] = new Platform(new Rectangle(0, 200, windowX, 20), true);
-            platforms[1] = new Platform(new Rectangle(0, 400, windowX, 20), false);
-            platforms[2] = new Platform(new Rectangle(0, 600, windowX, 20), true);
-            platforms[3] = new Platform(new Rectangle(0, 800, windowX, 20), false);
+            platforms[0] = new Platform(new Rectangle(0, 200, windowX, 20), 1);
+            platforms[1] = new Platform(new Rectangle(0, 400, windowX, 20), 2);
+            platforms[2] = new Platform(new Rectangle(0, 600, windowX, 20), 1);
+            platforms[3] = new Platform(new Rectangle(0, 800, windowX, 20), 2);
             //Level two platforms
-            platforms[4] = new Platform(new Rectangle(0, 600, windowX, 400), true);
-            platforms[5] = new Platform(new Rectangle(700, 0, 200, windowY), true);
+            platforms[4] = new Platform(new Rectangle(0, 600, windowX, 400), 1);
+            platforms[5] = new Platform(new Rectangle(700, 0, 200, windowY), 1);
             //Level three platforms
-            platforms[6] = new Platform(new Rectangle(100, 900, 200, 50), true);
-            platforms[7] = new Platform(new Rectangle(500, 650, 200, 50), false);
-            platforms[8] = new Platform(new Rectangle(100, 400, 200, 50), true);
-            platforms[9] = new Platform(new Rectangle(600, 200, 200, 50), false);
-            platforms[10] = new Platform(new Rectangle(1200, 800, 200, 50), true);
+            platforms[6] = new Platform(new Rectangle(100, 900, 200, 50), 1);
+            platforms[7] = new Platform(new Rectangle(500, 650, 200, 50), 2);
+            platforms[8] = new Platform(new Rectangle(100, 400, 200, 50), 1);
+            platforms[9] = new Platform(new Rectangle(600, 200, 200, 50), 2);
+            platforms[10] = new Platform(new Rectangle(1200, 800, 200, 50), 1);
             //Level four platforms
-            platforms[11] = new Platform(new Rectangle(200, 200, 20, 400), true);
-            platforms[12] = new Platform(new Rectangle(200, 200, 400, 20), true);
-            platforms[13] = new Platform(new Rectangle(580, 200, 20, 400), true);
-            platforms[14] = new Platform(new Rectangle(200, 600, 400, 20), true);
-            platforms[15] = new Platform(new Rectangle(800, 200, 20, 400), true);
-            platforms[16] = new Platform(new Rectangle(800, 200, 400, 20), true);
-            platforms[17] = new Platform(new Rectangle(1180, 200, 20, 400), true);
-            platforms[18] = new Platform(new Rectangle(800, 600, 400, 20), true);
-            platforms[19] = new Platform(new Rectangle(1400, 200, 20, 400), true);
-            platforms[20] = new Platform(new Rectangle(1400, 200, 400, 20), true);
-            platforms[21] = new Platform(new Rectangle(1780, 200, 20, 400), true);
-            platforms[22] = new Platform(new Rectangle(1400, 600, 400, 20), true);
+            platforms[11] = new Platform(new Rectangle(200, 200, 20, 400), 1);
+            platforms[12] = new Platform(new Rectangle(200, 200, 400, 20), 1);
+            platforms[13] = new Platform(new Rectangle(580, 200, 20, 400), 1);
+            platforms[14] = new Platform(new Rectangle(200, 600, 400, 20), 1);
+            platforms[15] = new Platform(new Rectangle(800, 200, 20, 400), 1);
+            platforms[16] = new Platform(new Rectangle(800, 200, 400, 20), 1);
+            platforms[17] = new Platform(new Rectangle(1180, 200, 20, 400), 1);
+            platforms[18] = new Platform(new Rectangle(800, 600, 400, 20), 1);
+            platforms[19] = new Platform(new Rectangle(1400, 200, 20, 400), 1);
+            platforms[20] = new Platform(new Rectangle(1400, 200, 400, 20), 1);
+            platforms[21] = new Platform(new Rectangle(1780, 200, 20, 400), 1);
+            platforms[22] = new Platform(new Rectangle(1400, 600, 400, 20), 1);
 
-
+            int dimension = 1;
             int[] platformStartIndexes = { 0, 4, 6, 11, 23 };
             int frameCount = 0;
             int dimensionFlipFrame = -200;
             int deathCount = 0;
-            int seconds = 0;
-            int minutes = 0;
+            int secondCount = 0;
+            int minuteCount = 0;
             Sound song = Raylib.LoadSound("song.mp3");
             Raylib.SetMasterVolume(0.2f);
-            bool music = true;
+            bool musicToggle = true;
 
 
             while (!Raylib.WindowShouldClose())
             {
-                if (!Raylib.IsSoundPlaying(song) && music)
+                if (!Raylib.IsSoundPlaying(song) && musicToggle)
                 {
                     Raylib.PlaySound(song);
                 }
 
-                if (gameState == "intro")
+                if (gamestate == "intro")
                 {
                     //Logic Introscreen
                     //Menu selecting and coloring
@@ -114,38 +114,34 @@ namespace Dimensional_Jumper
                         switch (introMenuIndex)
                         {
                             case 0:
-                                gameState = "game";
-                                for (int i = platformStartIndexes[0]; i < platformStartIndexes[1]; i++)
+                                gamestate = "game";
+                                dimension = 1;
+                                for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                                 {
-                                    if (i % 2 == 0)
-                                    {
-                                        platforms[i].active = true;
-                                    }
-                                    else
-                                    {
-                                        platforms[i].active = false;
-                                    }
+                                    platforms[i].checkDimension(dimension);
                                 }
+                                p.checkDimension(dimension);
+
                                 break;
 
                             case 2:
 
-                                if (music)
+                                if (musicToggle)
                                 {
                                     Raylib.PauseSound(song);
-                                    music = false;
+                                    musicToggle = false;
                                     musicText = "Music OFF";
                                 }
                                 else
                                 {
                                     Raylib.ResumeSound(song);
-                                    music = true;
+                                    musicToggle = true;
                                     musicText = "Music ON";
                                 }
                                 break;
 
                             case 3:
-                                Raylib.CloseWindow();
+                                gamestate = "end";
                                 break;
                         }
                     }
@@ -178,7 +174,7 @@ namespace Dimensional_Jumper
 
                     Raylib.EndDrawing();
                 }
-                else if (gameState == "game")
+                else if (gamestate == "game")
                 {
                     //Logic for the game
                     //Calculating the clock with framecount
@@ -186,11 +182,11 @@ namespace Dimensional_Jumper
                     frameCount++;
                     if ((frameCount % 60) == 0)
                     {
-                        seconds++;
-                        if ((seconds % 60) == 0)
+                        secondCount++;
+                        if ((secondCount % 60) == 0)
                         {
-                            minutes++;
-                            seconds = 0;
+                            minuteCount++;
+                            secondCount = 0;
                         }
                     }
 
@@ -203,98 +199,95 @@ namespace Dimensional_Jumper
                     {
                         for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                         {
-                            if (Raylib.CheckCollisionRecs(player.rec, platforms[i].rec) && platforms[i].active)
+                            if (Raylib.CheckCollisionRecs(p.rec, platforms[i].rec) && platforms[i].active)
                             {
                                 deathCount++;
-                                player.rec.x = player.startX;
-                                player.rec.y = player.startY;
-                                player.accY = 0;
+                                p.rec.x = p.startX;
+                                p.rec.y = p.startY;
+                                p.accY = 0;
                             }
                         }
                         //Because you cant be grounded after, this helps so you cant jump mid-air
-                        if (player.grounded == true)
+                        if (p.grounded == true)
                         {
-                            player.grounded = false;
+                            p.grounded = false;
                         }
                     }
                     //Function for the player movement
-                    player.Update();
+                    p.Update();
 
-                    if (player.rec.y >= 1000 || player.rec.x >= 1920 || player.rec.x + player.rec.width <= 0)
+                    if (p.rec.y >= 1000 || p.rec.x >= 1920 || p.rec.x + p.rec.width <= 0)
                     {
                         deathCount++;
-                        player.rec.x = player.startX;
-                        player.rec.y = player.startY;
-                        player.accY = 0;
+                        p.rec.x = p.startX;
+                        p.rec.y = p.startY;
+                        p.accY = 0;
                     }
 
                     //Check player and platform collision
                     for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                     {
-                        player.Collision(platforms[i]);
+                        p.Collision(platforms[i]);
                     }
 
                     //Check goal Collision
-                    if (Raylib.CheckCollisionRecs(goalRec, player.rec))
+                    if (Raylib.CheckCollisionRecs(goalRec, p.rec))
                     {
                         if (level == 1)
                         {
-                            for (int i = platformStartIndexes[1]; i < platformStartIndexes[2]; i++)
+                            dimension = 1;
+                            for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                             {
-                                platforms[i].active = true;
+                                platforms[i].checkDimension(dimension);
                             }
+                            p.checkDimension(dimension);
                             level++;
-                            player.startX = 100;
-                            player.startY = 100;
-                            player.rec.x = player.startX;
-                            player.rec.y = player.startY;
-                            player.accY = 0;
+                            p.startX = 100;
+                            p.startY = 100;
+                            p.rec.x = p.startX;
+                            p.rec.y = p.startY;
+                            p.accY = 0;
                             goalRec.x = 1750;
                             goalRec.y = 500;
                         }
                         else if (level == 2)
                         {
                             level++;
-
-                            for (int i = platformStartIndexes[2]; i < platformStartIndexes[3]; i++)
+                            dimension = 1;
+                            for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                             {
-                                if (i % 2 == 0)
-                                {
-                                    platforms[i].active = true;
-                                }
-                                else
-                                {
-                                    platforms[i].active = false;
-                                }
+                                platforms[i].checkDimension(dimension);
                             }
+                            p.checkDimension(dimension);
 
-                            player.startX = 120;
-                            player.startY = 600;
-                            player.rec.x = player.startX;
-                            player.rec.y = player.startY;
-                            player.accY = 0;
+                            p.startX = 120;
+                            p.startY = 600;
+                            p.rec.x = p.startX;
+                            p.rec.y = p.startY;
+                            p.accY = 0;
                             goalRec.x = 1750;
                             goalRec.y = 800;
                         }
                         else if (level == 3)
                         {
                             level++;
-                            for (int i = platformStartIndexes[3]; i < platformStartIndexes[4]; i++)
+                            dimension = 1;
+                            for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                             {
-                                platforms[i].active = true;
+                                platforms[i].checkDimension(dimension);
                             }
-
-                            player.startX = 400;
-                            player.startY = 400;
-                            player.rec.x = player.startX;
-                            player.rec.y = player.startY;
-                            player.accY = 0;
+                            p.checkDimension(dimension);
+                            p.startX = 400;
+                            p.startY = 400;
+                            p.rec.x = p.startX;
+                            p.rec.y = p.startY;
+                            p.accY = 0;
                             goalRec.x = 1550;
                             goalRec.y = 700;
                         }
                         else if (level == 4)
                         {
-                            gameState = "finish";
+                            gamestate = "finish";
                         }
 
                     }
@@ -302,14 +295,24 @@ namespace Dimensional_Jumper
                     //Check for menu controls
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_TAB))
                     {
-                        gameState = "intro";
+                        gamestate = "intro";
                     }
                     else if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
                     {
+                        if (dimension == 1)
+                        {
+                            dimension = 2;
+                        }
+                        else
+                        {
+                            dimension = 1;
+                        }
                         for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                         {
-                            platforms[i].changeDimension();
+                            platforms[i].checkDimension(dimension);
                         }
+                        p.checkDimension(dimension);
+
                         dimensionFlipFrame = frameCount;
                     }
 
@@ -320,7 +323,7 @@ namespace Dimensional_Jumper
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.BLACK);
                     Raylib.DrawText("Death Count: " + deathCount, 25, 25, 64, Color.WHITE);
-                    Raylib.DrawText("Time: " + minutes + ":" + seconds, 1500, 25, 64, Color.WHITE);
+                    Raylib.DrawText("Time: " + minuteCount + ":" + secondCount, 1500, 25, 64, Color.WHITE);
 
 
 
@@ -334,36 +337,42 @@ namespace Dimensional_Jumper
                     Raylib.DrawRectangleRec(goalRec, Color.GREEN);
 
                     //Draw the player
-                    player.Draw();
+                    p.Draw();
 
                     Raylib.EndDrawing();
                 }
-                else if (gameState == "finish")
+                else if (gamestate == "finish")
                 {
                     //Logic
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                     {
-                        gameState = "intro";
+                        gamestate = "intro";
                         level = 1;
-                        player.startX = 100;
-                        player.startY = 50;
-                        player.rec.x = player.startX;
-                        player.rec.y = player.startY;
+                        p.startX = 100;
+                        p.startY = 50;
+                        p.rec.x = p.startX;
+                        p.rec.y = p.startY;
                         deathCount = 0;
-                        seconds = 0;
-                        minutes = 0;
+                        secondCount = 0;
+                        minuteCount = 0;
 
                     }
                     //Drawing
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.PURPLE);
                     Raylib.DrawText("You won b", 50, 50, 64, Color.WHITE);
-                    Raylib.DrawText("Time: " + minutes + ":" + seconds, 450, 50, 64, Color.WHITE);
+                    Raylib.DrawText("Time: " + minuteCount + ":" + secondCount, 450, 50, 64, Color.WHITE);
                     Raylib.DrawText("Deaths: " + deathCount, 800, 50, 64, Color.WHITE);
 
                     Raylib.DrawText("Press enter to get to menu", 50, 300, 64, Color.WHITE);
                     Raylib.EndDrawing();
                 }
+
+                else if (gamestate == "end")
+                {
+                    Raylib.CloseWindow();
+                }
+
                 else
                 {
                     Raylib.BeginDrawing();
@@ -401,6 +410,7 @@ namespace Dimensional_Jumper
         public int g = 3;
         public int accY = 0;
 
+
         public Player(Rectangle r, Color p)
         {
             this.rec = r;
@@ -416,55 +426,56 @@ namespace Dimensional_Jumper
             //Reads the key inputs
             if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
             {
-                rec.x -= xspeed;
+                this.rec.x -= xspeed;
             }
             if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
             {
-                rec.x += xspeed;
+                this.rec.x += xspeed;
             }
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_W) && grounded)
             {
                 accY = 40;
-                grounded = false;
+                this.grounded = false;
             }
 
             //Calculating gravity and vertical acceleration
-            rec.y -= accY;
+            this.rec.y -= accY;
             accY -= g;
+
 
         }
 
 
-        public void Collision(Platform other)
+        public void Collision(Platform platform)
         {
-            if (Raylib.CheckCollisionRecs(this.rec, other.rec) && other.active)
+            if (Raylib.CheckCollisionRecs(this.rec, platform.rec) && platform.active)
             {
                 //Up
-                if (oldY + this.rec.height <= other.rec.y)
+                if (oldY + this.rec.height <= platform.rec.y)
                 {
                     g = 0;
                     accY = 0;
                     grounded = true;
-                    this.rec.y = other.rec.y - this.rec.height;
+                    this.rec.y = platform.rec.y - this.rec.height;
                 }
                 //Down
-                else if (oldY >= other.rec.y + other.rec.height)
+                else if (oldY >= platform.rec.y + platform.rec.height)
                 {
-                    this.rec.y = other.rec.y + other.rec.height;
+                    this.rec.y = platform.rec.y + platform.rec.height;
                 }
                 //Left
-                else if (oldX + this.rec.width <= other.rec.x)
+                else if (oldX + this.rec.width <= platform.rec.x)
                 {
-                    this.rec.x = other.rec.x - this.rec.width;
+                    this.rec.x = platform.rec.x - this.rec.width;
                 }
                 //Right
-                else if (oldX >= other.rec.x + other.rec.width)
+                else if (oldX >= platform.rec.x + platform.rec.width)
                 {
-                    this.rec.x = other.rec.x + other.rec.width;
+                    this.rec.x = platform.rec.x + platform.rec.width;
                 }
                 else
                 {
-                    this.rec.y = other.rec.y - this.rec.height;
+                    this.rec.y = platform.rec.y - this.rec.height;
                 }
             }
             else
@@ -479,6 +490,18 @@ namespace Dimensional_Jumper
         {
             Raylib.DrawRectangleRec(this.rec, this.c);
         }
+
+        public void checkDimension(int dimension)
+        {
+            if (dimension == 1)
+            {
+                this.c = Color.RED;
+            }
+            else
+            {
+                this.c = Color.WHITE;
+            }
+        }
     }
 
 
@@ -491,24 +514,24 @@ namespace Dimensional_Jumper
 
         public bool active;
 
-        public Platform(Rectangle r, bool ac)
+        public int dimensionActive;
+
+        public Platform(Rectangle r, int d)
         {
             this.rec = r;
-            this.active = ac;
-            if (this.active)
+            this.dimensionActive = d;
+            if (this.dimensionActive == 1)
             {
-                this.c = Color.PURPLE;
+                this.active = true;
             }
             else
             {
-                this.c = Color.GRAY;
+                this.active = false;
             }
         }
 
         public void Draw()
         {
-            Raylib.DrawRectangleRec(this.rec, this.c);
-
             if (this.active)
             {
                 this.c = Color.PURPLE;
@@ -517,11 +540,20 @@ namespace Dimensional_Jumper
             {
                 this.c = Color.GRAY;
             }
+
+            Raylib.DrawRectangleRec(this.rec, this.c);
         }
 
-        public void changeDimension()
+        public void checkDimension(int dimension)
         {
-            this.active = !this.active;
+            if (this.dimensionActive == dimension)
+            {
+                this.active = true;
+            }
+            else
+            {
+                this.active = false;
+            }
         }
     }
 }
