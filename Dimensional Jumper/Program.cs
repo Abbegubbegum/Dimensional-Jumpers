@@ -19,14 +19,16 @@ namespace Dimensional_Jumper
             Raylib.InitWindow(windowX, windowY, "Dimensional Jumper");
             Raylib.InitAudioDevice();
             Raylib.SetTargetFPS(60);
+            Sound song = Raylib.LoadSound("song.mp3");
+            Raylib.SetMasterVolume(0.2f);
 
-            //Intro variables
+            //Menu variables
             int introMenuIndex = 0;
             Color[] menuColors = { Color.BLACK, Color.GRAY, Color.GRAY, Color.GRAY };
             int levelMenuIndex = 0;
-            Color[] levelMenuColors = { Color.BLACK, Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY };
-
+            Color[] levelMenuColors = { Color.BLACK, Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY };
             string musicText = "Music ON";
+            bool musicToggle = true;
 
             //Game variables
             Rectangle goalRec = new Rectangle(1700, 700, 100, 100);
@@ -63,25 +65,24 @@ namespace Dimensional_Jumper
             platforms[23] = new Platform(new Rectangle(200, 400, 200, 800), 1);
             platforms[24] = new Platform(new Rectangle(200, 600, 400, 600), 1);
             platforms[25] = new Platform(new Rectangle(200, 800, 600, 400), 1);
-            platforms[26] = new Platform(new Rectangle(200, 1000, 800, 200), 1);
-            platforms[27] = new Platform(new Rectangle(100, 960, 150, 20), 1);
-            platforms[28] = new Platform(new Rectangle(100, 980, 800, 20), 2);
+            platforms[26] = new Platform(new Rectangle(100, 960, 150, 20), 1);
+            platforms[27] = new Platform(new Rectangle(100, 980, 800, 20), 2);
 
             Color gameBackground = Color.SKYBLUE;
-            int[] platformStartIndexes = { 0, 4, 6, 11, 23, 29 };
+            int[] platformStartIndexes = { 0, 4, 6, 11, 23, 28 };
             int dimension = 1;
-            int frameCount = 0;
             int dimensionFlipFrame = -200;
+
+            //Score keeping variables
+            int frameCount = 0;
             int deathCount = 0;
             int secondCount = 0;
             int minuteCount = 0;
-            Sound song = Raylib.LoadSound("song.mp3");
-            Raylib.SetMasterVolume(0.2f);
-            bool musicToggle = true;
 
-
+            //Main Game loop
             while (!Raylib.WindowShouldClose())
             {
+                //Reloops the song when it ends
                 if (!Raylib.IsSoundPlaying(song) && musicToggle)
                 {
                     Raylib.PlaySound(song);
@@ -119,11 +120,13 @@ namespace Dimensional_Jumper
                         menuColors[introMenuIndex] = Color.BLACK;
 
                     }
+
                     //Menu confirming
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                     {
                         switch (introMenuIndex)
                         {
+                            //"Start Game"
                             case 0:
                                 gamestate = "game";
                                 for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
@@ -135,10 +138,12 @@ namespace Dimensional_Jumper
 
                                 break;
 
+                            //"Level select"
                             case 1:
                                 gamestate = "levelSelect";
                                 break;
 
+                            //"Toggle music"
                             case 2:
 
                                 if (musicToggle)
@@ -155,6 +160,7 @@ namespace Dimensional_Jumper
                                 }
                                 break;
 
+                            //"Quit"
                             case 3:
                                 gamestate = "end";
                                 break;
@@ -186,12 +192,13 @@ namespace Dimensional_Jumper
                     Raylib.DrawText("TAB: Pause / Controls", 500, 640, 64, Color.GRAY);
                     Raylib.DrawText("ENTER: SELECT", 500, 700, 64, Color.GRAY);
 
-
                     Raylib.EndDrawing();
                 }
+
                 else if (gamestate == "levelSelect")
                 {
-
+                    //Level Select Logic
+                    //Menu selecting and coloring
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_S))
                     {
                         levelMenuColors[levelMenuIndex] = Color.GRAY;
@@ -204,8 +211,8 @@ namespace Dimensional_Jumper
                             levelMenuIndex++;
                         }
                         levelMenuColors[levelMenuIndex] = Color.BLACK;
-
                     }
+
                     else if (Raylib.IsKeyPressed(KeyboardKey.KEY_W))
                     {
                         levelMenuColors[levelMenuIndex] = Color.GRAY;
@@ -218,10 +225,12 @@ namespace Dimensional_Jumper
                             levelMenuIndex--;
                         }
                         levelMenuColors[levelMenuIndex] = Color.BLACK;
-
                     }
-                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+
+                    //Menu confirming
+                    if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                     {
+                        //The level is case +1, case 0 is level 1
                         switch (levelMenuIndex)
                         {
                             case 0:
@@ -295,27 +304,51 @@ namespace Dimensional_Jumper
                                 }
                                 gameBackground = Color.SKYBLUE;
                                 break;
+
                             case 4:
+                                gamestate = "game";
+                                level = 5;
+                                for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
+                                {
+                                    platforms[i].checkDimension(dimension);
+                                }
+                                gameBackground = Color.SKYBLUE;
+                                p.startX = 125;
+                                p.startY = 800;
+                                p.rec.x = p.startX;
+                                p.rec.y = p.startY;
+                                p.accY = 0;
+                                goalRec.x = 200;
+                                goalRec.y = 100;
+                                dimension = 1;
+                                break;
+
+                            case 5:
                                 gamestate = "intro";
                                 break;
                         }
                     }
+
+                    //Level select Drawing
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.PURPLE);
 
+                    //Menu buttons
                     Raylib.DrawText("Level 1", 50, 400, 64, levelMenuColors[0]);
                     Raylib.DrawText("Level 2", 50, 460, 64, levelMenuColors[1]);
                     Raylib.DrawText("Level 3", 50, 520, 64, levelMenuColors[2]);
                     Raylib.DrawText("Level 4", 50, 580, 64, levelMenuColors[3]);
-                    Raylib.DrawText("Back", 50, 640, 64, levelMenuColors[4]);
+                    Raylib.DrawText("Level 5", 50, 640, 64, levelMenuColors[4]);
+                    Raylib.DrawText("Back", 50, 700, 64, levelMenuColors[5]);
 
                     Raylib.EndDrawing();
                 }
+
                 else if (gamestate == "game")
                 {
+
                     //Logic for the game
                     //Calculating the clock with framecount
-
                     frameCount++;
                     if ((frameCount % 60) == 0)
                     {
@@ -327,13 +360,10 @@ namespace Dimensional_Jumper
                         }
                     }
 
-
-
-
-
-                    //If you switched dimensions last frame and now collide, then you die
+                    //Post dimension flip checks
                     if (dimensionFlipFrame + 1 == frameCount)
                     {
+                        //If you collide the frame after you flip, you respawn
                         for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                         {
                             if (Raylib.CheckCollisionRecs(p.rec, platforms[i].rec) && platforms[i].active)
@@ -344,15 +374,18 @@ namespace Dimensional_Jumper
                                 p.accY = 0;
                             }
                         }
-                        //Because you cant be grounded after, this helps so you cant jump mid-air
+
+                        //Because you cant be grounded after flip, this helps so you cant jump mid-air
                         if (p.grounded == true)
                         {
                             p.grounded = false;
                         }
                     }
+
                     //Function for the player movement
                     p.Update();
 
+                    //Border collision
                     if (p.rec.y >= 1000 || p.rec.x >= 1920 || p.rec.x + p.rec.width <= 0)
                     {
                         deathCount++;
@@ -449,11 +482,14 @@ namespace Dimensional_Jumper
 
                     }
 
-                    //Check for menu controls
+                    //Check for controls
+                    //Pause
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_TAB))
                     {
                         gamestate = "intro";
                     }
+
+                    //Flip dimension
                     else if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
                     {
                         if (dimension == 1)
@@ -466,26 +502,22 @@ namespace Dimensional_Jumper
                             gameBackground = Color.SKYBLUE;
                             dimension = 1;
                         }
+
                         for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
                         {
                             platforms[i].checkDimension(dimension);
                         }
 
-
-
                         dimensionFlipFrame = frameCount;
                     }
-
-
-
 
                     //Drawing level 
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(gameBackground);
+
+                    //Score keeping
                     Raylib.DrawText("Death Count: " + deathCount, 25, 25, 64, Color.WHITE);
                     Raylib.DrawText("Time: " + minuteCount + ":" + secondCount, 1500, 25, 64, Color.WHITE);
-
-
 
                     //Draw the platforms
                     for (int i = platformStartIndexes[level - 1]; i < platformStartIndexes[level]; i++)
@@ -501,9 +533,11 @@ namespace Dimensional_Jumper
 
                     Raylib.EndDrawing();
                 }
+
                 else if (gamestate == "finish")
                 {
-                    //Logic
+
+                    //Finish Screen logic
                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                     {
                         gamestate = "intro";
@@ -518,22 +552,26 @@ namespace Dimensional_Jumper
                         minuteCount = 0;
 
                     }
-                    //Drawing
+                    //Finish Screen Drawing
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.PURPLE);
+
+                    //Score
                     Raylib.DrawText("You won b", 50, 50, 64, Color.WHITE);
                     Raylib.DrawText("Time: " + minuteCount + ":" + secondCount, 450, 50, 64, Color.WHITE);
                     Raylib.DrawText("Deaths: " + deathCount, 800, 50, 64, Color.WHITE);
-
                     Raylib.DrawText("Press enter to get to menu", 50, 300, 64, Color.WHITE);
+
                     Raylib.EndDrawing();
                 }
 
+                //Quit
                 else if (gamestate == "end")
                 {
                     Raylib.CloseWindow();
                 }
 
+                //Debugging
                 else
                 {
                     Raylib.BeginDrawing();
@@ -542,17 +580,15 @@ namespace Dimensional_Jumper
                 }
 
             }
-
             Raylib.CloseAudioDevice();
             Raylib.CloseWindow();
-
         }
 
 
 
     }
 
-    //Making a player class with a rectangle and a color
+    //Making a player class
     class Player
     {
         public Rectangle rec = new Rectangle(100, 50, 50, 100);
@@ -571,6 +607,7 @@ namespace Dimensional_Jumper
         public int g = 3;
         public int accY = 0;
 
+        //Player movement function
         public void Update()
         {
             //Stores old x and y levels for collision later
@@ -599,7 +636,7 @@ namespace Dimensional_Jumper
 
         }
 
-
+        //Player collision with a platform function
         public void Collision(Platform platform)
         {
             if (Raylib.CheckCollisionRecs(this.rec, platform.rec) && platform.active)
@@ -627,11 +664,8 @@ namespace Dimensional_Jumper
                 {
                     this.rec.x = platform.rec.x + platform.rec.width;
                 }
-                else
-                {
-                    this.rec.y = platform.rec.y - this.rec.height;
-                }
             }
+            //Readd gravity if not colliding
             else
             {
                 g = 3;
@@ -648,7 +682,7 @@ namespace Dimensional_Jumper
     }
 
 
-    //A class for a platform with a rectangle avd a boolean for which "dimension" its in at the start
+    //A class for a platform with a rectangle and an int for which dimension it is active in, 1 or 2
     class Platform
     {
         public Rectangle rec;
@@ -659,6 +693,7 @@ namespace Dimensional_Jumper
 
         public int dimensionActive;
 
+        //Initialize platform
         public Platform(Rectangle r, int d)
         {
             this.rec = r;
@@ -666,6 +701,7 @@ namespace Dimensional_Jumper
             this.checkDimension(1);
         }
 
+        //Platform draw function
         public void Draw()
         {
             if (this.active)
@@ -680,6 +716,7 @@ namespace Dimensional_Jumper
             Raylib.DrawRectangleRec(this.rec, this.c);
         }
 
+        //Check if platform should be active function
         public void checkDimension(int dimension)
         {
             if (this.dimensionActive == dimension)
